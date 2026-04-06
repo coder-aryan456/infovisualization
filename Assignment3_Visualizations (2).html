@@ -146,10 +146,10 @@
 
   <!-- STATS -->
   <div class="stats-row">
-    <div class="stat s1"><div class="stat-label">Total Revenue</div><div class="stat-val">$18,543<sub>USD</sub></div></div>
-    <div class="stat s2"><div class="stat-label">Avg Order Value</div><div class="stat-val">$431<sub>/ order</sub></div></div>
-    <div class="stat s3"><div class="stat-label">Top Product</div><div class="stat-val" style="font-size:1.3rem">Binder<sub>by rev</sub></div></div>
-    <div class="stat s4"><div class="stat-label">Date Range</div><div class="stat-val" style="font-size:1.2rem">2021–22<sub>2 yrs</sub></div></div>
+    <div class="stat s1"><div class="stat-label">Total Revenue</div><div class="stat-val">$19,628<sub>USD</sub></div></div>
+    <div class="stat s2"><div class="stat-label">Avg Order Value</div><div class="stat-val">$456<sub>/ order</sub></div></div>
+    <div class="stat s3"><div class="stat-label">Top Product</div><div class="stat-val" style="font-size:1.3rem">Binder<sub>$9,578 rev</sub></div></div>
+    <div class="stat s4"><div class="stat-label">Top Rep</div><div class="stat-val" style="font-size:1.3rem">Kivell<sub>$3,109 rev</sub></div></div>
   </div>
 
   <!-- ROW 1 -->
@@ -333,10 +333,26 @@ vegaEmbed("#vis3", {
         }
       },
       {
-        mark: { type:"rule", color:"#ff6b6b", strokeDash:[5,3], strokeWidth:2.2, opacity:0.9 },
+        transform: [
+          { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
+        ],
+        mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2.5, opacity:1 },
         encoding: {
-          x: { aggregate:"mean", field:"Units", type:"quantitative" },
-          tooltip: [{ aggregate:"mean", field:"Units", type:"quantitative", title:"Mean", format:".1f" }]
+          x: { field:"meanUnits", type:"quantitative" },
+          y: { value: 0 },
+          y2: { value: 150 },
+          tooltip: [{ field:"meanUnits", type:"quantitative", title:"Mean Units", format:".1f" }]
+        }
+      },
+      {
+        transform: [
+          { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
+        ],
+        mark: { type:"text", color:"#ff6b6b", fontSize:9, dy:-4, fontWeight:"bold" },
+        encoding: {
+          x: { field:"meanUnits", type:"quantitative" },
+          y: { value: 0 },
+          text: { field:"meanUnits", type:"quantitative", format:".0f" }
         }
       }
     ]
@@ -453,8 +469,13 @@ vegaEmbed("#vis6", {
             }
           },
           {
-            mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2 },
-            encoding: { x: { aggregate:"mean", field:"Units", type:"quantitative" } }
+            transform: [{ aggregate:[{ op:"mean", field:"Units", as:"m" }] }],
+            mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2.5, opacity:1 },
+            encoding: {
+              x: { field:"m", type:"quantitative" },
+              y: { value:0 }, y2: { value:120 },
+              tooltip:[{ field:"m", type:"quantitative", title:"Mean", format:".1f" }]
+            }
           }
         ]
       }
