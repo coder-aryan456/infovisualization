@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Assignment 3 — Office Supply Sales Dashboard</title>
+  <title>Assignment 3 — Advanced Sales Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -49,23 +49,35 @@
 
     .wrapper { position: relative; z-index: 1; max-width: 1380px; margin: 0 auto; padding: 0 28px 64px; }
 
-    /* ── HEADER ── */
-    header { padding: 50px 0 34px; border-bottom: 1px solid var(--border); margin-bottom: 34px; animation: fadeDown .7s ease both; }
+    /* ── HEADER & FILTER ── */
+    header { padding: 50px 0 24px; animation: fadeDown .7s ease both; }
     .eyebrow { font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.2em; color:var(--accent); text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:12px; }
     .eyebrow::before { content:''; width:28px; height:2px; background:var(--accent); box-shadow:0 0 8px var(--accent); flex-shrink:0; }
     header h1 { font-size:clamp(1.7rem,3.2vw,2.7rem); font-weight:700; letter-spacing:-.03em; margin-bottom:8px; line-height:1.1; }
     header h1 span { color:var(--accent); }
     .header-sub { font-size:.88rem; color:var(--muted); margin-bottom:18px; }
-    .header-meta { display:flex; gap:10px; flex-wrap:wrap; }
-    .pill { font-family:'Space Mono',monospace; font-size:.67rem; padding:4px 12px; border-radius:100px; border:1px solid; letter-spacing:.05em; }
-    .pill-c { border-color:var(--accent);  color:var(--accent);  background:rgba(0,200,255,.07); }
-    .pill-p { border-color:var(--accent2); color:var(--accent2); background:rgba(123,97,255,.07); }
-    .pill-g { border-color:var(--accent4); color:var(--accent4); background:rgba(57,217,138,.07); }
-    .pill-r { border-color:var(--accent3); color:var(--accent3); background:rgba(255,107,107,.07); }
+    
+    .filter-bar {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      background: var(--surface); padding: 18px 24px;
+      border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 34px; animation: fadeDown .8s ease both;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .filter-group { display: flex; align-items: center; gap: 12px; }
+    .filter-group label {
+      font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent4); text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .filter-group select {
+      background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      padding: 8px 16px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+      cursor: pointer; outline: none; transition: 0.2s; min-width: 160px;
+    }
+    .filter-group select:hover, .filter-group select:focus { border-color: var(--accent4); }
 
     /* ── STATS ── */
     .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:36px; animation:fadeUp .7s .12s ease both; }
-    .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; position:relative; overflow:hidden; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; position:relative; overflow:hidden; transition: 0.3s ease; }
     .stat::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--lc); box-shadow:0 0 10px var(--lc); }
     .stat.s1{--lc:var(--accent)} .stat.s2{--lc:var(--accent2)} .stat.s3{--lc:var(--accent4)} .stat.s4{--lc:var(--accent3)}
     .stat-label { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-family:'Space Mono',monospace; margin-bottom:7px; }
@@ -73,7 +85,7 @@
     .stat-val sub { font-size:.78rem; font-weight:400; color:var(--muted); margin-left:3px; vertical-align:middle; }
 
     /* ── SECTION LABEL ── */
-    .sec { font-family:'Space Mono',monospace; font-size:.63rem; letter-spacing:.18em; color:var(--muted); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .sec { font-family:'Space Mono',monospace; font-size:.63rem; letter-spacing:.18em; color:var(--muted); text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px; margin-top: 24px; }
     .sec::after { content:''; flex:1; height:1px; background:var(--border); }
 
     /* ── GRIDS ── */
@@ -82,13 +94,8 @@
 
     /* ── CARD ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 22px 14px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .25s, box-shadow .25s;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 22px 22px 14px; position: relative; overflow: hidden; transition: border-color .25s, box-shadow .25s;
       animation: fadeUp .6s ease both;
     }
     .card:hover { border-color: rgba(0,200,255,.35); box-shadow: 0 0 32px rgba(0,200,255,.1); }
@@ -103,19 +110,13 @@
     .bp  { background:rgba(123,97,255,.1);  color:var(--accent2); border:1px solid rgba(123,97,255,.22); }
     .bg  { background:rgba(57,217,138,.1);  color:var(--accent4); border:1px solid rgba(57,217,138,.22); }
     .br  { background:rgba(255,107,107,.1); color:var(--accent3); border:1px solid rgba(255,107,107,.22); }
+    .by  { background:rgba(245,166,35,.1);  color:#f5a623; border:1px solid rgba(245,166,35,.22); }
     .cd  { font-size:.78rem; color:var(--muted); margin-bottom:14px; line-height:1.5; }
 
-    /* ── VIS CONTAINERS — fixed sizes so Vega can render ── */
     .vis-box { width:100%; overflow:hidden; }
     .vis-box .vega-embed { width:100% !important; }
-    .vis-box .vega-embed canvas,
-    .vis-box .vega-embed svg { max-width:100% !important; display:block; }
+    .vis-box .vega-embed canvas, .vis-box .vega-embed svg { max-width:100% !important; display:block; margin: 0 auto; }
 
-    /* stagger */
-    .card:nth-child(1){animation-delay:.08s} .card:nth-child(2){animation-delay:.16s}
-    .card:nth-child(3){animation-delay:.22s} .card:nth-child(4){animation-delay:.28s}
-
-    /* ── FOOTER ── */
     footer { margin-top:52px; border-top:1px solid var(--border); padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
     footer p { font-family:'Space Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:.07em; }
     .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent4); margin-right:6px; animation:pulse 2s ease-in-out infinite; }
@@ -123,397 +124,448 @@
     @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:none} }
     @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:none} }
     @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-    @media(max-width:820px) { .g2{grid-template-columns:1fr} .stats-row{grid-template-columns:1fr 1fr} }
-    @media(max-width:480px) { .stats-row{grid-template-columns:1fr 1fr} }
+    @media(max-width:820px) { .g2{grid-template-columns:1fr} .stats-row{grid-template-columns:1fr 1fr} .filter-bar{flex-direction: column; align-items: flex-start;} }
+    @media(max-width:480px) { .stats-row{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
 <div class="wrapper">
 
-  <!-- HEADER -->
   <header>
     <div class="eyebrow">Assignment 3 &mdash; Vega-Lite Visualization</div>
     <h1>Office Supply <span>Sales Analytics</span></h1>
-    <p class="header-sub">Interactive multiview dashboard &middot; Vega-Lite 5 &middot; HW_III dataset &middot; 2021–2022</p>
-    <div class="header-meta">
-      <span class="pill pill-c">43 Orders</span>
-      <span class="pill pill-p">5 Products</span>
-      <span class="pill pill-g">11 Reps</span>
-      <span class="pill pill-r">3 Regions</span>
-    </div>
+    <p class="header-sub">Interactive multiview dashboard &middot; Advanced Data Interactions &middot; 2021–2022</p>
   </header>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat s1"><div class="stat-label">Total Revenue</div><div class="stat-val">$19,628<sub>USD</sub></div></div>
-    <div class="stat s2"><div class="stat-label">Avg Order Value</div><div class="stat-val">$456<sub>/ order</sub></div></div>
-    <div class="stat s3"><div class="stat-label">Top Product</div><div class="stat-val" style="font-size:1.3rem">Binder<sub>$9,578 rev</sub></div></div>
-    <div class="stat s4"><div class="stat-label">Top Rep</div><div class="stat-val" style="font-size:1.3rem">Kivell<sub>$3,109 rev</sub></div></div>
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="regionFilter">Region:</label>
+      <select id="regionFilter" onchange="applyFilters()">
+        <option value="All">All Regions</option>
+        <option value="Central">Central Region</option>
+        <option value="East">East Region</option>
+        <option value="West">West Region</option>
+      </select>
+    </div>
+    
+    <div class="filter-group">
+      <label for="itemFilter">Product:</label>
+      <select id="itemFilter" onchange="applyFilters()">
+        <option value="All">All Products</option>
+        <option value="Binder">Binder</option>
+        <option value="Desk">Desk</option>
+        <option value="Pen">Pen</option>
+        <option value="Pen Set">Pen Set</option>
+        <option value="Pencil">Pencil</option>
+      </select>
+    </div>
   </div>
 
-  <!-- ROW 1 -->
+  <div class="stats-row">
+    <div class="stat s1"><div class="stat-label">Total Revenue</div><div class="stat-val" id="stat-rev">-</div></div>
+    <div class="stat s2"><div class="stat-label">Avg Order Value</div><div class="stat-val" id="stat-avg">-</div></div>
+    <div class="stat s3"><div class="stat-label">Top Product</div><div class="stat-val" style="font-size:1.3rem" id="stat-item">-</div></div>
+    <div class="stat s4"><div class="stat-label">Top Rep</div><div class="stat-val" style="font-size:1.3rem" id="stat-rep">-</div></div>
+  </div>
+
   <div class="sec">Distribution &amp; Trends</div>
   <div class="g2">
     <div class="card">
       <div class="num">01</div>
-      <div class="ch"><div class="ct">Revenue by Sales Rep</div><span class="cb bc">Donut · Tooltip</span></div>
-      <p class="cd">Total revenue per rep. Hover a slice for exact figures.</p>
+      <div class="ch"><div class="ct">Revenue by Sales Rep</div><span class="cb bc">Donut</span></div>
+      <p class="cd">Total revenue per rep. Tooltip displays precise figures.</p>
       <div class="vis-box" id="vis1"></div>
     </div>
     <div class="card">
       <div class="num">02</div>
-      <div class="ch"><div class="ct">Product Sales Over Time</div><span class="cb bp">Streamgraph · Color</span></div>
-      <p class="cd">How each product's sales flowed across 2021–2022. Colored by item.</p>
+      <div class="ch"><div class="ct">Product Sales Over Time</div><span class="cb bp">Streamgraph</span></div>
+      <p class="cd">Sales flow across 2021–2022 colored by product item.</p>
       <div class="vis-box" id="vis2"></div>
     </div>
   </div>
 
-  <!-- ROW 2 -->
   <div class="sec">Distribution Analysis</div>
   <div class="g1">
     <div class="card">
       <div class="num">03</div>
-      <div class="ch"><div class="ct">Units Distribution per Product — Trellis Histogram</div><span class="cb bg">Mean Overlay · Faceted</span></div>
-      <p class="cd">Histogram of units ordered per item. Red dashed rule marks the mean for each facet.</p>
+      <div class="ch"><div class="ct">Units Distribution per Product</div><span class="cb bg">Trellis · Mean</span></div>
+      <p class="cd">Histogram of units ordered. Red dashed rule marks the mean for each facet.</p>
       <div class="vis-box" id="vis3"></div>
     </div>
   </div>
 
-  <!-- ROW 3 -->
   <div class="sec">Interactive Explorations</div>
   <div class="g2">
     <div class="card">
       <div class="num">04</div>
-      <div class="ch"><div class="ct">Revenue by Region</div><span class="cb br">Click to Highlight</span></div>
+      <div class="ch"><div class="ct">Revenue by Region</div><span class="cb br">Click Bar</span></div>
       <p class="cd">Click a bar to isolate that region. Dims others for focus.</p>
       <div class="vis-box" id="vis4"></div>
     </div>
     <div class="card">
       <div class="num">05</div>
-      <div class="ch"><div class="ct">Units vs Total Revenue</div><span class="cb bp">Drag to Brush</span></div>
-      <p class="cd">Drag to select a range. Highlighted points show item, rep, date &amp; total.</p>
+      <div class="ch"><div class="ct">Units vs Total Revenue</div><span class="cb bp">Drag Brush</span></div>
+      <p class="cd">Drag to select a range. Points detail item, rep, and total.</p>
       <div class="vis-box" id="vis5"></div>
     </div>
   </div>
 
-  <!-- ROW 4 MULTIVIEW -->
-  <div class="sec">Multiview Concatenation</div>
+  <div class="sec">Advanced Relationships (Extra Points)</div>
+  <div class="g2">
+    <div class="card">
+      <div class="num">06</div>
+      <div class="ch"><div class="ct">Revenue by Item & Region</div><span class="cb by">Heatmap</span></div>
+      <p class="cd">Density matrix of sales performance. Darker colors signify higher revenue.</p>
+      <div class="vis-box" id="vis6"></div>
+    </div>
+    <div class="card">
+      <div class="num">07</div>
+      <div class="ch"><div class="ct">Unit Cost vs Units Ordered</div><span class="cb bc">Bubble</span></div>
+      <p class="cd">Analyzes pricing strategy. Circle size represents total revenue generated.</p>
+      <div class="vis-box" id="vis7"></div>
+    </div>
+  </div>
+
+  <div class="sec">Ultimate Master View</div>
   <div class="g1">
     <div class="card mv">
-      <div class="num">06</div>
-      <div class="ch"><div class="ct" style="color:var(--accent2)">All 5 Visualizations — Concatenated Multiview</div><span class="cb bp">vconcat · hconcat</span></div>
-      <p class="cd">Single Vega-Lite spec combining all charts with independent color scales.</p>
-      <div class="vis-box" id="vis6"></div>
+      <div class="num">08</div>
+      <div class="ch"><div class="ct" style="color:var(--accent2)">All Visualizations — Concatenated Multiview</div><span class="cb bp">vconcat/hconcat</span></div>
+      <p class="cd">Single unified spec rendering charts simultaneously with independent scales.</p>
+      <div class="vis-box" id="vis8"></div>
     </div>
   </div>
 
   <footer>
-    <p><span class="dot"></span>Vega-Lite 5 &mdash; HW_III.xlsx &mdash; Office Supply Sales 2021–2022</p>
+    <p><span class="dot"></span>Vega-Lite 5 &mdash; Dynamic Global State</p>
     <p>Assignment 3 &mdash; Visualization Course</p>
   </footer>
 </div>
 
 <script>
-// ── data ──────────────────────────────────────────────────
+// ── DATA ──────────────────────────────────────────────────
 const RAW = [{"OrderDate":"2021-01-06","Region":"East","Rep":"Jones","Item":"Pencil","Units":95,"Unit Cost":1.99,"Total":189.05},{"OrderDate":"2021-01-23","Region":"Central","Rep":"Kivell","Item":"Binder","Units":50,"Unit Cost":19.99,"Total":999.5},{"OrderDate":"2021-02-09","Region":"Central","Rep":"Jardine","Item":"Pencil","Units":36,"Unit Cost":4.99,"Total":179.64},{"OrderDate":"2021-02-26","Region":"Central","Rep":"Gill","Item":"Pen","Units":27,"Unit Cost":19.99,"Total":539.73},{"OrderDate":"2021-03-15","Region":"West","Rep":"Sorvino","Item":"Pencil","Units":56,"Unit Cost":2.99,"Total":167.44},{"OrderDate":"2021-04-01","Region":"East","Rep":"Jones","Item":"Binder","Units":60,"Unit Cost":4.99,"Total":299.4},{"OrderDate":"2021-04-18","Region":"Central","Rep":"Andrews","Item":"Pencil","Units":75,"Unit Cost":1.99,"Total":149.25},{"OrderDate":"2021-05-05","Region":"Central","Rep":"Jardine","Item":"Pencil","Units":90,"Unit Cost":4.99,"Total":449.1},{"OrderDate":"2021-05-22","Region":"West","Rep":"Thompson","Item":"Pencil","Units":32,"Unit Cost":1.99,"Total":63.68},{"OrderDate":"2021-06-08","Region":"East","Rep":"Jones","Item":"Binder","Units":60,"Unit Cost":8.99,"Total":539.4},{"OrderDate":"2021-06-25","Region":"Central","Rep":"Morgan","Item":"Pencil","Units":90,"Unit Cost":4.99,"Total":449.1},{"OrderDate":"2021-07-12","Region":"East","Rep":"Howard","Item":"Binder","Units":29,"Unit Cost":1.99,"Total":57.71},{"OrderDate":"2021-07-29","Region":"East","Rep":"Parent","Item":"Binder","Units":81,"Unit Cost":19.99,"Total":1619.19},{"OrderDate":"2021-08-15","Region":"East","Rep":"Jones","Item":"Pencil","Units":35,"Unit Cost":4.99,"Total":174.65},{"OrderDate":"2021-09-01","Region":"Central","Rep":"Smith","Item":"Desk","Units":2,"Unit Cost":125.0,"Total":250.0},{"OrderDate":"2021-09-18","Region":"East","Rep":"Jones","Item":"Pen Set","Units":16,"Unit Cost":15.99,"Total":255.84},{"OrderDate":"2021-10-05","Region":"Central","Rep":"Morgan","Item":"Binder","Units":28,"Unit Cost":8.99,"Total":251.72},{"OrderDate":"2021-10-22","Region":"East","Rep":"Jones","Item":"Pen","Units":64,"Unit Cost":8.99,"Total":575.36},{"OrderDate":"2021-11-08","Region":"East","Rep":"Parent","Item":"Pen","Units":15,"Unit Cost":19.99,"Total":299.85},{"OrderDate":"2021-11-25","Region":"Central","Rep":"Kivell","Item":"Pen Set","Units":96,"Unit Cost":4.99,"Total":479.04},{"OrderDate":"2021-12-12","Region":"Central","Rep":"Smith","Item":"Pencil","Units":67,"Unit Cost":1.29,"Total":86.43},{"OrderDate":"2021-12-29","Region":"East","Rep":"Parent","Item":"Pen Set","Units":74,"Unit Cost":15.99,"Total":1183.26},{"OrderDate":"2022-01-15","Region":"Central","Rep":"Gill","Item":"Binder","Units":46,"Unit Cost":8.99,"Total":413.54},{"OrderDate":"2022-02-01","Region":"Central","Rep":"Smith","Item":"Binder","Units":87,"Unit Cost":15.0,"Total":1305.0},{"OrderDate":"2022-02-18","Region":"East","Rep":"Jones","Item":"Binder","Units":4,"Unit Cost":4.99,"Total":19.96},{"OrderDate":"2022-03-07","Region":"West","Rep":"Sorvino","Item":"Binder","Units":7,"Unit Cost":19.99,"Total":139.93},{"OrderDate":"2022-03-24","Region":"Central","Rep":"Jardine","Item":"Pen Set","Units":50,"Unit Cost":4.99,"Total":249.5},{"OrderDate":"2022-04-10","Region":"Central","Rep":"Andrews","Item":"Pencil","Units":66,"Unit Cost":1.99,"Total":131.34},{"OrderDate":"2022-04-27","Region":"East","Rep":"Howard","Item":"Pen","Units":96,"Unit Cost":4.99,"Total":479.04},{"OrderDate":"2022-05-14","Region":"Central","Rep":"Gill","Item":"Pencil","Units":53,"Unit Cost":1.29,"Total":68.37},{"OrderDate":"2022-05-31","Region":"Central","Rep":"Gill","Item":"Binder","Units":80,"Unit Cost":8.99,"Total":719.2},{"OrderDate":"2022-06-17","Region":"Central","Rep":"Kivell","Item":"Desk","Units":5,"Unit Cost":125.0,"Total":625.0},{"OrderDate":"2022-07-04","Region":"East","Rep":"Jones","Item":"Pen Set","Units":62,"Unit Cost":4.99,"Total":309.38},{"OrderDate":"2022-07-21","Region":"Central","Rep":"Morgan","Item":"Pen Set","Units":55,"Unit Cost":12.49,"Total":686.95},{"OrderDate":"2022-08-07","Region":"Central","Rep":"Kivell","Item":"Pen Set","Units":42,"Unit Cost":23.95,"Total":1005.9},{"OrderDate":"2022-08-24","Region":"West","Rep":"Sorvino","Item":"Desk","Units":3,"Unit Cost":275.0,"Total":825.0},{"OrderDate":"2022-09-10","Region":"Central","Rep":"Gill","Item":"Pencil","Units":7,"Unit Cost":1.29,"Total":9.03},{"OrderDate":"2022-09-27","Region":"West","Rep":"Sorvino","Item":"Pen","Units":76,"Unit Cost":1.99,"Total":151.24},{"OrderDate":"2022-10-14","Region":"West","Rep":"Thompson","Item":"Binder","Units":57,"Unit Cost":19.99,"Total":1139.43},{"OrderDate":"2022-10-31","Region":"Central","Rep":"Andrews","Item":"Pencil","Units":14,"Unit Cost":1.29,"Total":18.06},{"OrderDate":"2022-11-17","Region":"Central","Rep":"Jardine","Item":"Binder","Units":11,"Unit Cost":4.99,"Total":54.89},{"OrderDate":"2022-12-04","Region":"Central","Rep":"Jardine","Item":"Binder","Units":94,"Unit Cost":19.99,"Total":1879.06},{"OrderDate":"2022-12-21","Region":"Central","Rep":"Andrews","Item":"Binder","Units":28,"Unit Cost":4.99,"Total":139.72}];
 
-const DS = { values: RAW };
-
-// ── shared dark axis/legend config ────────────────────────
+// ── VEGA STYLING ──────────────────────────────────────────
 const CFG = {
   background: "#0d1525",
   view: { stroke: "#1e2d42", fill: "#0d1525" },
   axis: {
-    gridColor: "#182436",
-    domainColor: "#1e2d42",
-    tickColor: "#1e2d42",
-    labelColor: "#607d9b",
-    titleColor: "#7a9abf",
-    labelFont: "DM Sans",
-    titleFont: "DM Sans",
-    labelFontSize: 11,
-    titleFontSize: 12
+    gridColor: "#182436", domainColor: "#1e2d42", tickColor: "#1e2d42",
+    labelColor: "#607d9b", titleColor: "#7a9abf", labelFont: "DM Sans",
+    titleFont: "DM Sans", labelFontSize: 11, titleFontSize: 12
   },
-  legend: {
-    labelColor: "#8aa4c4",
-    titleColor: "#607d9b",
-    labelFont: "DM Sans",
-    titleFont: "Space Mono",
-    labelFontSize: 11,
-    titleFontSize: 10,
-    symbolSize: 120,
-    padding: 8
-  },
-  title: {
-    color: "#c8d8eb",
-    font: "DM Sans",
-    fontSize: 13,
-    fontWeight: 600
-  }
+  legend: { labelColor: "#8aa4c4", titleColor: "#607d9b", labelFont: "DM Sans", titleFont: "Space Mono", labelFontSize: 11, titleFontSize: 10, symbolSize: 120, padding: 8 },
+  title: { color: "#c8d8eb", font: "DM Sans", fontSize: 13, fontWeight: 600 }
 };
 
-const PLASMA = { scheme: "plasma" };
-const REPS   = { range: ["#00c8ff","#7b61ff","#39d98a","#ff6b6b","#f5a623","#c471ed","#12c2e9","#f64f59","#43cea2","#67b26f","#4ca2cd"] };
-const REGS   = { range: ["#00c8ff","#7b61ff","#39d98a"] };
-
-// embed options — NO theme override, use our CFG instead
+// Fixed domains so colors don't jump around when filtering
+const ITEMS = ["Binder", "Desk", "Pen", "Pen Set", "Pencil"];
+const ITEM_SCALE = { domain: ITEMS, scheme: "plasma" };
+const REPS  = { domain: ["Andrews","Gill","Howard","Jardine","Jones","Kivell","Morgan","Parent","Smith","Sorvino","Thompson"], range: ["#00c8ff","#7b61ff","#39d98a","#ff6b6b","#f5a623","#c471ed","#12c2e9","#f64f59","#43cea2","#67b26f","#4ca2cd"] };
+const REGS  = { domain: ["Central","East","West"], range: ["#00c8ff","#7b61ff","#39d98a"] };
 const OPT = { actions: { export: true, source: false, compiled: false, editor: false }, renderer: "canvas" };
 
-// ════════════════════════════════════════════════════
-// 1 · DONUT
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis1", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  width: 380, height: 300,
-  data: DS,
-  transform: [{ aggregate: [{ op:"sum", field:"Total", as:"Rev" }], groupby: ["Rep"] }],
-  mark: { type:"arc", innerRadius:80, outerRadius:130, stroke:"#0d1525", strokeWidth:2.5, cursor:"pointer" },
-  encoding: {
-    theta: { field:"Rev", type:"quantitative", stack:true },
-    color: { field:"Rep", type:"nominal", scale:REPS, legend:{ title:"Rep", orient:"right" } },
-    tooltip: [
-      { field:"Rep",  type:"nominal",      title:"Sales Rep" },
-      { field:"Rev",  type:"quantitative", title:"Revenue ($)", format:",.2f" }
-    ]
-  }
-}, OPT);
+// ── APP LOGIC ─────────────────────────────────────────────
+function applyFilters() {
+  const regionVal = document.getElementById("regionFilter").value;
+  const itemVal = document.getElementById("itemFilter").value;
+  
+  const filteredData = RAW.filter(d => {
+    const matchRegion = (regionVal === "All") || (d.Region === regionVal);
+    const matchItem = (itemVal === "All") || (d.Item === itemVal);
+    return matchRegion && matchItem;
+  });
+  
+  updateStats(filteredData);
+  renderCharts(filteredData);
+}
 
-// ════════════════════════════════════════════════════
-// 2 · STREAMGRAPH
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis2", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  width: 380, height: 300,
-  data: DS,
-  mark: { type:"area", interpolate:"monotone", opacity:0.82 },
-  encoding: {
-    x: { field:"OrderDate", type:"temporal", axis:{ title:"Date", format:"%b %Y", labelAngle:-30 } },
-    y: { field:"Total", type:"quantitative", stack:"center", axis:{ title:"Total (stacked)", grid:true } },
-    color: { field:"Item", type:"nominal", scale:PLASMA, legend:{ title:"Item" } },
-    tooltip: [
-      { field:"Item",      type:"nominal" },
-      { field:"OrderDate", type:"temporal",     title:"Date", format:"%b %d, %Y" },
-      { field:"Total",     type:"quantitative",  format:",.2f" }
-    ]
-  }
-}, OPT);
+function updateStats(data) {
+  let totalRev = 0, itemRev = {}, repRev = {};
+  data.forEach(d => {
+    totalRev += d.Total;
+    itemRev[d.Item] = (itemRev[d.Item] || 0) + d.Total;
+    repRev[d.Rep] = (repRev[d.Rep] || 0) + d.Total;
+  });
+  let avgOrder = data.length ? totalRev / data.length : 0;
+  
+  let topItem = Object.keys(itemRev).reduce((a, b) => itemRev[a] > itemRev[b] ? a : b, "-");
+  let topRep = Object.keys(repRev).reduce((a, b) => repRev[a] > repRev[b] ? a : b, "-");
+  
+  document.getElementById('stat-rev').innerHTML = `$${totalRev.toLocaleString(undefined, {maximumFractionDigits:0})}<sub>USD</sub>`;
+  document.getElementById('stat-avg').innerHTML = `$${avgOrder.toLocaleString(undefined, {maximumFractionDigits:0})}<sub>/ order</sub>`;
+  document.getElementById('stat-item').innerHTML = data.length ? `${topItem}<sub>$${itemRev[topItem].toLocaleString(undefined, {maximumFractionDigits:0})} rev</sub>` : "N/A";
+  document.getElementById('stat-rep').innerHTML = data.length ? `${topRep}<sub>$${repRev[topRep].toLocaleString(undefined, {maximumFractionDigits:0})} rev</sub>` : "N/A";
+}
 
-// ════════════════════════════════════════════════════
-// 3 · TRELLIS HISTOGRAM
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis3", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  data: DS,
-  facet: {
-    field: "Item", type:"nominal", columns:5,
-    header: {
-      title: "Item",
-      labelColor: "#8aa4c4", titleColor: "#607d9b",
-      labelFont: "DM Sans", titleFont: "Space Mono",
-      labelFontSize: 13, titleFontSize: 11
+function renderCharts(dataArray) {
+  const DS = { values: dataArray };
+
+  // 1. DONUT
+  vegaEmbed("#vis1", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    config: CFG, width: 380, height: 300, data: DS,
+    transform: [{ aggregate: [{ op:"sum", field:"Total", as:"Rev" }], groupby: ["Rep"] }],
+    mark: { type:"arc", innerRadius:80, outerRadius:130, stroke:"#0d1525", strokeWidth:2.5, cursor:"pointer" },
+    encoding: {
+      theta: { field:"Rev", type:"quantitative", stack:true },
+      color: { field:"Rep", type:"nominal", scale:REPS, legend:{ title:"Rep", orient:"right" } },
+      tooltip: [
+        { field:"Rep",  type:"nominal",      title:"Sales Rep" },
+        { field:"Rev",  type:"quantitative", title:"Revenue ($)", format:",.2f" }
+      ]
     }
-  },
-  spec: {
-    width: 160, height: 150,
-    layer: [
+  }, OPT);
+
+  // 2. STREAMGRAPH
+  vegaEmbed("#vis2", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    config: CFG, width: 380, height: 300, data: DS,
+    mark: { type:"area", interpolate:"monotone", opacity:0.82 },
+    encoding: {
+      x: { field:"OrderDate", type:"temporal", axis:{ title:"Date", format:"%b %Y", labelAngle:-30 } },
+      y: { field:"Total", type:"quantitative", stack:"center", axis:{ title:"Total (stacked)", grid:true } },
+      color: { field:"Item", type:"nominal", scale:ITEM_SCALE, legend:{ title:"Item" } },
+      tooltip: [
+        { field:"Item",      type:"nominal" },
+        { field:"OrderDate", type:"temporal",     title:"Date", format:"%b %d, %Y" },
+        { field:"Total",     type:"quantitative",  format:",.2f" }
+      ]
+    }
+  }, OPT);
+
+  // 3. TRELLIS HISTOGRAM (Restored with mean lines and explicit boundaries)
+  vegaEmbed("#vis3", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    config: CFG, data: DS,
+    facet: {
+      field: "Item", type:"nominal", columns:5,
+      header: {
+        title: "Item", labelColor: "#8aa4c4", titleColor: "#607d9b",
+        labelFont: "DM Sans", titleFont: "Space Mono",
+        labelFontSize: 13, titleFontSize: 11
+      }
+    },
+    spec: {
+      width: 160, height: 150,
+      layer: [
+        {
+          mark: { type:"bar", opacity:0.85 },
+          encoding: {
+            x: { field:"Units", type:"quantitative", bin:{ maxbins:10 }, axis:{ title:"Units", labelFontSize:10 } },
+            y: { aggregate:"count", type:"quantitative", axis:{ title:"Count", labelFontSize:10 } },
+            color: { field:"Item", type:"nominal", scale:ITEM_SCALE, legend:null },
+            tooltip: [
+              { field:"Units", bin:true,        title:"Units range" },
+              { aggregate:"count", type:"quantitative", title:"Count" }
+            ]
+          }
+        },
+        {
+          transform: [
+            { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
+          ],
+          mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2.5, opacity:1 },
+          encoding: {
+            x: { field:"meanUnits", type:"quantitative" },
+            y: { value: 0 },
+            y2: { value: 150 },
+            tooltip: [{ field:"meanUnits", type:"quantitative", title:"Mean Units", format:".1f" }]
+          }
+        },
+        {
+          transform: [
+            { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
+          ],
+          mark: { type:"text", color:"#ff6b6b", fontSize:9, dy:-4, fontWeight:"bold" },
+          encoding: {
+            x: { field:"meanUnits", type:"quantitative" },
+            y: { value: 0 },
+            text: { field:"meanUnits", type:"quantitative", format:".0f" }
+          }
+        }
+      ]
+    }
+  }, OPT);
+
+  // 4. REGION BARS
+  vegaEmbed("#vis4", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    config: CFG, width: 360, height: 280, data: DS,
+    params: [{ name:"regionSel", select:{ type:"point", fields:["Region"] } }],
+    transform: [{ aggregate:[{ op:"sum", field:"Total", as:"RegTotal" }], groupby:["Region"] }],
+    mark: { type:"bar", cornerRadiusTopLeft:5, cornerRadiusTopRight:5, cursor:"pointer" },
+    encoding: {
+      x: { field:"Region", type:"nominal", axis:{ title:"Region", labelFontSize:13 }, sort:"-y" },
+      y: { field:"RegTotal", type:"quantitative", axis:{ title:"Revenue ($)", format:",.0f" } },
+      color: {
+        condition: { param:"regionSel", field:"Region", type:"nominal", scale:REGS },
+        value: "#1a2840"
+      },
+      opacity: { condition:{ param:"regionSel", value:1 }, value:0.28 },
+      tooltip: [
+        { field:"Region",   type:"nominal" },
+        { field:"RegTotal", type:"quantitative", title:"Revenue ($)", format:",.2f" }
+      ]
+    }
+  }, OPT);
+
+  // 5. SCATTER BRUSH
+  vegaEmbed("#vis5", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+    config: CFG, width: 360, height: 280, data: DS,
+    params: [{
+      name: "brush",
+      select: {
+        type: "interval", encodings: ["x","y"],
+        mark: { fill:"#00c8ff", fillOpacity:0.1, stroke:"#00c8ff", strokeWidth:1.5 }
+      }
+    }],
+    mark: { type:"circle", cursor:"crosshair" },
+    encoding: {
+      x: { field:"Units", type:"quantitative", axis:{ title:"Units Ordered" } },
+      y: { field:"Total", type:"quantitative", axis:{ title:"Total Revenue ($)" } },
+      color: {
+        condition: { param:"brush", field:"Item", type:"nominal", scale:ITEM_SCALE },
+        value: "#1a2840"
+      },
+      size: { condition:{ param:"brush", value:140 }, value:55 },
+      opacity: { condition:{ param:"brush", value:0.95 }, value:0.18 },
+      tooltip: [
+        { field:"Rep",       type:"nominal" },
+        { field:"Item",      type:"nominal" },
+        { field:"Units",     type:"quantitative" },
+        { field:"Total",     type:"quantitative", format:",.2f" },
+        { field:"OrderDate", type:"temporal",     title:"Date", format:"%b %d, %Y" }
+      ]
+    }
+  }, OPT);
+
+  // 6. EXTRA: HEATMAP
+  vegaEmbed("#vis6", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json", config: CFG,
+    width: 360, height: 280, data: DS,
+    mark: { type:"rect", tooltip: true, cornerRadius: 4 },
+    encoding: {
+      x: { field:"Region", type:"nominal", axis:{ title:"Region", labelAngle:0 } },
+      y: { field:"Item", type:"nominal", axis:{ title:"Item" } },
+      color: { aggregate:"sum", field:"Total", type:"quantitative", scale:{ scheme:"tealblues" }, legend:{ title:"Revenue ($)" } },
+      tooltip: [{ field:"Item" }, { field:"Region" }, { aggregate:"sum", field:"Total", title:"Total Rev ($)", format:",.2f" }]
+    }
+  }, OPT);
+
+  // 7. EXTRA: BUBBLE
+  vegaEmbed("#vis7", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json", config: CFG,
+    width: 360, height: 280, data: DS,
+    mark: { type:"circle", opacity: 0.8, stroke: "#1e2d42", strokeWidth: 1 },
+    encoding: {
+      x: { field:"Unit Cost", type:"quantitative", axis:{ title:"Unit Cost ($)" } },
+      y: { field:"Units", type:"quantitative", axis:{ title:"Units Sold" } },
+      size: { field:"Total", type:"quantitative", scale:{ range:[50, 800] }, legend:{ title:"Total Rev ($)" } },
+      color: { field:"Item", type:"nominal", scale:ITEM_SCALE },
+      tooltip: [{ field:"Item" }, { field:"Unit Cost", format:",.2f" }, { field:"Units" }, { field:"Total", title:"Total Rev ($)", format:",.2f" }]
+    }
+  }, OPT);
+
+  // 8. MASTER MULTIVIEW (Restored with all charts)
+  vegaEmbed("#vis8", {
+    $schema: "https://vega.github.io/schema/vega-lite/v5.json", config: CFG, data: DS,
+    vconcat: [
       {
-        mark: { type:"bar", opacity:0.85 },
-        encoding: {
-          x: { field:"Units", type:"quantitative", bin:{ maxbins:10 }, axis:{ title:"Units", labelFontSize:10 } },
-          y: { aggregate:"count", type:"quantitative", axis:{ title:"Count", labelFontSize:10 } },
-          color: { field:"Item", type:"nominal", scale:PLASMA, legend:null },
-          tooltip: [
-            { field:"Units", bin:true,        title:"Units range" },
-            { aggregate:"count", type:"quantitative", title:"Count" }
+        hconcat: [
+          {
+            width: 250, height: 220, title: "1 · Donut — Revenue",
+            transform: [{ aggregate:[{ op:"sum", field:"Total", as:"Rev" }], groupby:["Rep"] }],
+            mark: { type:"arc", innerRadius:65, outerRadius:110, stroke:"#0d1525", strokeWidth:2 },
+            encoding: {
+              theta: { field:"Rev", type:"quantitative", stack:true },
+              color: { field:"Rep", type:"nominal", scale:REPS, legend:{ title:"Rep" } },
+              tooltip: [{ field:"Rep" },{ field:"Rev",type:"quantitative",format:",.2f" }]
+            }
+          },
+          {
+            width: 440, height: 220, title: "2 · Streamgraph",
+            mark: { type:"area", interpolate:"monotone", opacity:0.82 },
+            encoding: {
+              x: { field:"OrderDate", type:"temporal", axis:{ title:"Date", format:"%b %Y" } },
+              y: { field:"Total", type:"quantitative", stack:"center", axis:{ title:"Total ($)" } },
+              color: { field:"Item", type:"nominal", scale:ITEM_SCALE, legend:{ title:"Item" } },
+              tooltip: [{ field:"Item" },{ field:"Total",type:"quantitative",format:",.2f" }]
+            }
+          }
+        ]
+      },
+      {
+        title: "3 · Trellis Histogram — Units per Item",
+        facet: { field:"Item", type:"nominal", columns:5, header:{ labelColor:"#8aa4c4", labelFont:"DM Sans", labelFontSize:12 } },
+        spec: {
+          width: 140, height: 120,
+          layer: [
+            { 
+              mark: { type:"bar", opacity:0.85 }, 
+              encoding: { 
+                x: { field:"Units", type:"quantitative", bin:{maxbins:10} }, 
+                y: { aggregate:"count" }, 
+                color: { field:"Item", scale:ITEM_SCALE, legend:null } 
+              } 
+            },
+            { 
+              transform: [{ aggregate:[{ op:"mean", field:"Units", as:"m" }] }], 
+              mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2 }, 
+              encoding: { x: { field:"m", type:"quantitative" }, y: { value: 0 }, y2: { value: 120 } } 
+            },
+            {
+              transform: [{ aggregate: [{ op:"mean", field:"Units", as:"m" }] }],
+              mark: { type:"text", color:"#ff6b6b", fontSize:9, dy:-4, fontWeight:"bold" },
+              encoding: { x: { field:"m", type:"quantitative" }, y: { value: 0 }, text: { field:"m", type:"quantitative", format:".0f" } }
+            }
           ]
         }
       },
       {
-        transform: [
-          { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
-        ],
-        mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2.5, opacity:1 },
-        encoding: {
-          x: { field:"meanUnits", type:"quantitative" },
-          y: { value: 0 },
-          y2: { value: 150 },
-          tooltip: [{ field:"meanUnits", type:"quantitative", title:"Mean Units", format:".1f" }]
-        }
-      },
-      {
-        transform: [
-          { aggregate: [{ op:"mean", field:"Units", as:"meanUnits" }] }
-        ],
-        mark: { type:"text", color:"#ff6b6b", fontSize:9, dy:-4, fontWeight:"bold" },
-        encoding: {
-          x: { field:"meanUnits", type:"quantitative" },
-          y: { value: 0 },
-          text: { field:"meanUnits", type:"quantitative", format:".0f" }
-        }
-      }
-    ]
-  }
-}, OPT);
-
-// ════════════════════════════════════════════════════
-// 4 · REGION BARS (click)
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis4", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  width: 360, height: 280,
-  data: DS,
-  params: [{ name:"regionSel", select:{ type:"point", fields:["Region"] } }],
-  transform: [{ aggregate:[{ op:"sum", field:"Total", as:"RegTotal" }], groupby:["Region"] }],
-  mark: { type:"bar", cornerRadiusTopLeft:5, cornerRadiusTopRight:5, cursor:"pointer" },
-  encoding: {
-    x: { field:"Region", type:"nominal", axis:{ title:"Region", labelFontSize:13 }, sort:"-y" },
-    y: { field:"RegTotal", type:"quantitative", axis:{ title:"Revenue ($)", format:",.0f" } },
-    color: {
-      condition: { param:"regionSel", field:"Region", type:"nominal", scale:REGS },
-      value: "#1a2840"
-    },
-    opacity: { condition:{ param:"regionSel", value:1 }, value:0.28 },
-    tooltip: [
-      { field:"Region",   type:"nominal" },
-      { field:"RegTotal", type:"quantitative", title:"Revenue ($)", format:",.2f" }
-    ]
-  }
-}, OPT);
-
-// ════════════════════════════════════════════════════
-// 5 · SCATTER + BRUSH
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis5", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  width: 360, height: 280,
-  data: DS,
-  params: [{
-    name: "brush",
-    select: {
-      type: "interval", encodings: ["x","y"],
-      mark: { fill:"#00c8ff", fillOpacity:0.1, stroke:"#00c8ff", strokeWidth:1.5 }
-    }
-  }],
-  mark: { type:"circle", cursor:"crosshair" },
-  encoding: {
-    x: { field:"Units", type:"quantitative", axis:{ title:"Units Ordered" } },
-    y: { field:"Total", type:"quantitative", axis:{ title:"Total Revenue ($)" } },
-    color: {
-      condition: { param:"brush", field:"Item", type:"nominal", scale:PLASMA },
-      value: "#1a2840"
-    },
-    size: { condition:{ param:"brush", value:140 }, value:55 },
-    opacity: { condition:{ param:"brush", value:0.95 }, value:0.18 },
-    tooltip: [
-      { field:"Rep",       type:"nominal" },
-      { field:"Item",      type:"nominal" },
-      { field:"Units",     type:"quantitative" },
-      { field:"Total",     type:"quantitative", format:",.2f" },
-      { field:"OrderDate", type:"temporal",     title:"Date", format:"%b %d, %Y" }
-    ]
-  }
-}, OPT);
-
-// ════════════════════════════════════════════════════
-// 6 · MULTIVIEW (all 5 concatenated)
-// ════════════════════════════════════════════════════
-vegaEmbed("#vis6", {
-  $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-  config: CFG,
-  data: DS,
-  vconcat: [
-    {
-      hconcat: [
-        {
-          width: 260, height: 240,
-          title: "1 · Donut — Revenue by Rep",
-          transform: [{ aggregate:[{ op:"sum", field:"Total", as:"Rev" }], groupby:["Rep"] }],
-          mark: { type:"arc", innerRadius:65, outerRadius:110, stroke:"#0d1525", strokeWidth:2 },
-          encoding: {
-            theta: { field:"Rev", type:"quantitative", stack:true },
-            color: { field:"Rep", type:"nominal", scale:REPS, legend:{ title:"Rep" } },
-            tooltip: [{ field:"Rep",type:"nominal" },{ field:"Rev",type:"quantitative",format:",.2f" }]
-          }
-        },
-        {
-          width: 380, height: 240,
-          title: "2 · Streamgraph — Sales Over Time",
-          mark: { type:"area", interpolate:"monotone", opacity:0.82 },
-          encoding: {
-            x: { field:"OrderDate", type:"temporal", axis:{ title:"Date", format:"%b %Y", labelAngle:-30 } },
-            y: { field:"Total", type:"quantitative", stack:"center", axis:{ title:"Stacked Total" } },
-            color: { field:"Item", type:"nominal", scale:PLASMA, legend:{ title:"Item" } },
-            tooltip: [{ field:"Item",type:"nominal" },{ field:"Total",type:"quantitative",format:",.2f" }]
-          }
-        }
-      ]
-    },
-    {
-      title: "3 · Trellis Histogram — Units per Item",
-      facet: { field:"Item", type:"nominal", columns:5, header:{ labelColor:"#8aa4c4", labelFont:"DM Sans", labelFontSize:12 } },
-      spec: {
-        width: 130, height: 120,
-        layer: [
+        hconcat: [
           {
-            mark: { type:"bar", opacity:0.85 },
-            encoding: {
-              x: { field:"Units", type:"quantitative", bin:{ maxbins:10 }, axis:{ title:"Units", labelFontSize:9 } },
-              y: { aggregate:"count", type:"quantitative", axis:{ title:"Count", labelFontSize:9 } },
-              color: { field:"Item", type:"nominal", scale:PLASMA, legend:null }
+            width: 250, height: 180, title: "4 · Region Revenue",
+            transform: [{ aggregate:[{ op:"sum", field:"Total", as:"RT" }], groupby:["Region"] }],
+            mark: { type:"bar", cornerRadiusTopLeft:4, cornerRadiusTopRight:4 },
+            encoding: { 
+              x: { field:"Region", type:"nominal", sort:"-y" }, 
+              y: { field:"RT", type:"quantitative" }, 
+              color: { field:"Region", scale:REGS },
+              tooltip: [{ field:"Region" },{ field:"RT",type:"quantitative",format:",.2f" }]
             }
           },
           {
-            transform: [{ aggregate:[{ op:"mean", field:"Units", as:"m" }] }],
-            mark: { type:"rule", color:"#ff6b6b", strokeDash:[4,3], strokeWidth:2.5, opacity:1 },
-            encoding: {
-              x: { field:"m", type:"quantitative" },
-              y: { value:0 }, y2: { value:120 },
-              tooltip:[{ field:"m", type:"quantitative", title:"Mean", format:".1f" }]
+            width: 280, height: 180, title: "5 · Units vs Total",
+            mark: { type:"circle", opacity:0.75 },
+            encoding: { 
+              x: { field:"Units", type:"quantitative" }, 
+              y: { field:"Total", type:"quantitative" }, 
+              color: { field:"Item", scale:ITEM_SCALE },
+              tooltip: [{ field:"Item" },{ field:"Total",type:"quantitative",format:",.2f" }]
+            }
+          },
+          {
+            width: 180, height: 180, title: "6 · Heatmap",
+            mark: { type:"rect", cornerRadius: 2 },
+            encoding: { 
+              x: { field:"Region", type:"nominal" }, 
+              y: { field:"Item", type:"nominal" }, 
+              color: { aggregate:"sum", field:"Total", scale:{ scheme:"tealblues" }, legend:null },
+              tooltip: [{ field:"Item" },{ field:"Region" },{ aggregate:"sum", field:"Total", title:"Total Rev ($)", format:",.2f" }]
             }
           }
         ]
       }
-    },
-    {
-      hconcat: [
-        {
-          width: 280, height: 200,
-          title: "4 · Revenue by Region (click bar)",
-          params: [{ name:"rSel2", select:{ type:"point", fields:["Region"] } }],
-          transform: [{ aggregate:[{ op:"sum", field:"Total", as:"RT" }], groupby:["Region"] }],
-          mark: { type:"bar", cornerRadiusTopLeft:4, cornerRadiusTopRight:4, cursor:"pointer" },
-          encoding: {
-            x: { field:"Region", type:"nominal", sort:"-y" },
-            y: { field:"RT", type:"quantitative", axis:{ format:",.0f", title:"Revenue ($)" } },
-            color: { condition:{ param:"rSel2", field:"Region", type:"nominal", scale:REGS }, value:"#1a2840" },
-            opacity: { condition:{ param:"rSel2", value:1 }, value:0.28 },
-            tooltip: [{ field:"Region",type:"nominal" },{ field:"RT",type:"quantitative",format:",.2f" }]
-          }
-        },
-        {
-          width: 340, height: 200,
-          title: "5 · Units vs Total (drag to brush)",
-          params: [{ name:"br2", select:{ type:"interval" } }],
-          mark: { type:"circle", cursor:"crosshair" },
-          encoding: {
-            x: { field:"Units", type:"quantitative", axis:{ title:"Units" } },
-            y: { field:"Total", type:"quantitative", axis:{ title:"Total ($)" } },
-            color: { condition:{ param:"br2", field:"Item", type:"nominal", scale:PLASMA }, value:"#1a2840" },
-            opacity: { condition:{ param:"br2", value:0.9 }, value:0.15 },
-            tooltip: [{ field:"Rep",type:"nominal" },{ field:"Item",type:"nominal" },{ field:"Units",type:"quantitative" },{ field:"Total",type:"quantitative",format:",.2f" }]
-          }
-        }
-      ]
-    }
-  ],
-  resolve: { scale: { color:"independent" } }
-}, OPT);
+    ],
+    resolve: { scale: { color:"independent" } }
+  }, OPT);
+}
+
+// Init App
+applyFilters();
 </script>
 </body>
 </html>
